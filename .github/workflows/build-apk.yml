@@ -10,10 +10,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      GRADLE_VERSION: 8.5
-      ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
-      JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,9 +25,9 @@ jobs:
       - name: Install Gradle
         run: |
           mkdir -p $HOME/gradle
-          wget -q https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip
-          unzip -qq gradle-${GRADLE_VERSION}-bin.zip -d $HOME/gradle
-          export GRADLE_HOME=$HOME/gradle/gradle-${GRADLE_VERSION}
+          wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip
+          unzip -qq gradle-8.5-bin.zip -d $HOME/gradle
+          export GRADLE_HOME=$HOME/gradle/gradle-8.5
           export PATH=$GRADLE_HOME/bin:$PATH
           gradle --version
 
@@ -42,9 +38,7 @@ jobs:
           build-tools: 34.0.0
           ndk-version: 25.2.9519653
           cmake-version: 3.22.1
-
-      - name: Accept Android SDK licenses
-        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+          accept-android-sdk-licenses: true
 
       - name: Build Debug APK
         run: gradle assembleDebug
