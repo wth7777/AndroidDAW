@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GRADLE_VERSION: 8.5
-      ANDROID_SDK_ROOT: ${{ github.workflow }}/android-sdk
-      JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
