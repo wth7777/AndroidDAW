@@ -10,6 +10,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GRADLE_VERSION: 8.5
+      ANDROID_SDK_ROOT: ${{ github.workflow }}/android-sdk
+      JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,9 +26,12 @@ jobs:
 
       - name: Install Gradle
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gradle
-          gradle -v
+          mkdir -p $HOME/gradle
+          wget -q https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip
+          unzip -qq gradle-${GRADLE_VERSION}-bin.zip -d $HOME/gradle
+          export GRADLE_HOME=$HOME/gradle/gradle-${GRADLE_VERSION}
+          export PATH=$GRADLE_HOME/bin:$PATH
+          gradle --version
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -34,14 +41,11 @@ jobs:
           ndk-version: 25.2.9519653
           cmake-version: 3.22.1
 
-      - name: Generate Gradle wrapper (if missing)
-        run: |
-          if [ ! -f gradlew ]; then
-            gradle wrapper --gradle-version 8.5
-          fi
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --info
+        run: gradle assembleDebug
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
