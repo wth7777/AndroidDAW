@@ -28,8 +28,8 @@ jobs:
           mkdir -p $HOME/Android/Sdk
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
           unzip -q commandlinetools-linux-9477386_latest.zip -d $HOME/Android/Sdk/cmdline-tools
-          # Use the latest version of cmdline-tools
-          mv $HOME/Android/Sdk/cmdline-tools/cmdline-tools $HOME/Android/Sdk/cmdline-tools/latest
+          # Move the tools into latest folder (the zip extracts into cmdline-tools directly)
+          mv $HOME/Android/Sdk/cmdline-tools/* $HOME/Android/Sdk/cmdline-tools/latest/ 2>/dev/null || true
 
       - name: Accept Android SDK Licenses
         run: |
