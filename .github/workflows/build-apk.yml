@@ -20,23 +20,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
-
-      - name: Install Android SDK components
+      - name: Install Gradle
         run: |
-          # Use the preinstalled Android SDK
-          export ANDROID_SDK_ROOT=/usr/local/lib/android/sdk
-          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
-          
-          # Accept licenses
-          yes | sdkmanager --licenses
-          
-          # Install required components
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;25.2.9519653" "cmake;3.22.1"
-          
-          # Verify installation
-          sdkmanager --list | grep -E "platforms|build-tools|ndk|cmake|platform-tools"
+          sudo apt-get update
+          sudo apt-get install -y gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 34
+          build-tools: 34.0.0
+          ndk-version: 25.2.9519653
+          cmake-version: 3.22.1
 
       - name: Build Debug APK
         run: gradle assembleDebug
