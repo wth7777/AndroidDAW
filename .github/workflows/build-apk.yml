@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: true  # This initializes submodules
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -23,27 +25,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
-      - name: Install Android Command Line Tools
-        run: |
-          mkdir -p $HOME/Android/Sdk
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-          unzip -q commandlinetools-linux-9477386_latest.zip -d $HOME/Android/Sdk/cmdline-tools
-          # Move the tools into latest folder (the zip extracts into cmdline-tools directly)
-          mv $HOME/Android/Sdk/cmdline-tools/* $HOME/Android/Sdk/cmdline-tools/latest/ 2>/dev/null || true
-
-      - name: Accept Android SDK Licenses
-        run: |
-          yes | $HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-
-      - name: Install Android SDK Components
-        run: |
-          $HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;25.2.9519653" "cmake;3.22.1"
-
-      - name: Set environment variables
-        run: |
-          echo "ANDROID_SDK_ROOT=$HOME/Android/Sdk" >> $GITHUB_ENV
-          echo "ANDROID_NDK_ROOT=$HOME/Android/Sdk/ndk/25.2.9519653" >> $GITHUB_ENV
-          echo "PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH" >> $GITHUB_ENV
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 34
+          build-tools: 34.0.0
+          ndk-version: 25.2.9519653
+          cmake-version: 3.22.1
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
